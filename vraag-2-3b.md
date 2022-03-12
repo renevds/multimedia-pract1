@@ -1,0 +1,1 @@
+De lzw comressie kan de lange sequenties van gelijk gekleurde pixels in test_bw, en dus gelijke indices compresseren.

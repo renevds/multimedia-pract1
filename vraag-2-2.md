@@ -1,1 +1,1 @@
-
+De gerandomiseerde selectie van kleuren zorgt voor schommelingen in de PSNR voor een zelfde b-waarde. Het optimale kleurenpalet is niet random. Verder zorgt een hogere b-waarde voor een betere kwaliteit. De kwaliteit is echter veel hoger als die van de grayscale methode.

@@ -31,7 +31,9 @@ def make_grayscale_color_table(color_table_size):
     Makes an evenly-spaced color table with shape (color_table_size, 3),
     with dtype np.uint8 filled with grayscale values ranging from 0 to 255.
     """
-    raise NotImplementedError()
+    return np.rint(
+        np.repeat(np.reshape((np.arange(color_table_size) / (color_table_size - 1)) * 255, (color_table_size, 1)),
+                  repeats=3, axis=1)).astype(np.uint8)
 
 
 def make_random_sample_color_table(color_table_size, img):
@@ -40,7 +42,19 @@ def make_random_sample_color_table(color_table_size, img):
     a color table of shape (color_table_size, 3). Shape of `img` is
     (height, width, 3).
     """
-    raise NotImplementedError()
+    colors = img.reshape(-1, 3)
+    rows = colors.shape[0]
+    random_indices = np.random.choice(rows, size=color_table_size, replace=False)
+    return colors[random_indices, :]
+
+
+def median_help(bucket):
+    if len(bucket) == 1:
+        return [bucket, bucket]
+    print(type(bucket))
+    var_index = np.argmax(np.var(bucket, axis=0))
+    sorted_bucket = bucket[bucket[:, var_index].argsort()]
+    return np.split(sorted_bucket, 2, axis=0)
 
 
 def make_median_cut_color_table(color_table_size, img):
@@ -49,7 +63,25 @@ def make_median_cut_color_table(color_table_size, img):
     the non-recursive median cut algorithm. Shape of `img` is
     (height, width, 3).
     """
-    raise NotImplementedError()
+    buckets = [np.unique(img.reshape(-1, 3), axis=0)]
+
+    # numpy can't take uneven sizes in a 2D array
+    if len(buckets[0]) % 2:
+        buckets[0] = np.vstack([buckets[0], [0, 0, 0]])
+
+    while len(buckets) < color_table_size:
+        new_buckets = []
+        for i in buckets:
+            new_buckets += median_help(i)
+        buckets = new_buckets
+
+    size = int(round(len(buckets[0])/2))
+    ret = []
+    for i in buckets:
+        size = int(round(len(i) / 2))
+        ret.append(i[size])
+
+    return np.array(ret).astype(np.uint8)
 
 
 def make_kmeans_color_table(color_table_size, img):

@@ -1,6 +1,6 @@
 import numpy as np
 
-from gifencoder import calculate_psnr
+from gifencoder import calculate_psnr, make_grayscale_color_table
 
 
 def simple_psnr_test():
@@ -22,3 +22,6 @@ def expected_value_psnr_test():
 if __name__ == '__main__':
     simple_psnr_test()
     print(f'should be around 7.75: {expected_value_psnr_test()}')
+    a = make_grayscale_color_table(10)
+    print(a)
+    print(np.shape(a))
