@@ -89,7 +89,11 @@ def make_kmeans_color_table(color_table_size, img):
     Makes a color table with shape (color_table_size, 3) and dtype np.uint8,
     based on the k-means clustering algorithm. Shape of `img` is (height, width, 3).
     """
-    raise NotImplementedError()
+    colors = img.reshape(-1, 3)
+    kmeans = cluster.MiniBatchKMeans(color_table_size, n_init=4)
+    res = kmeans.fit(colors).cluster_centers_
+    print(res)
+    return np.rint(res).astype(np.uint8)
 
 
 def find_nearest_color_index(color_table, rgb_vec):
