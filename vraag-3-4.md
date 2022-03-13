@@ -1,1 +1,1 @@
-
+PSNR vergelijkt pixel met pixel en mist het optische effect dat het resultaat beter maakt voor menselijke gebruikers.

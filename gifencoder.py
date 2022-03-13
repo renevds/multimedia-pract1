@@ -75,11 +75,10 @@ def make_median_cut_color_table(color_table_size, img):
             new_buckets += median_help(i)
         buckets = new_buckets
 
-    size = int(round(len(buckets[0])/2))
+    size = int(round(len(buckets[0]) / 2))
     ret = []
     for i in buckets:
-        size = int(round(len(i) / 2))
-        ret.append(i[size])
+        ret.append(np.average(i, axis=0))
 
     return np.array(ret).astype(np.uint8)
 
@@ -143,7 +142,25 @@ def transform_image_to_indices_diffusion_dithering(img, color_table, dither_matr
     rows = img.shape[0]
     cols = img.shape[1]
     color_table_indices = np.zeros((rows, cols), dtype=np.uint8)
-    raise NotImplementedError()
+
+    for i in range(rows):
+        for j in range(cols):
+            img[i][j] = img[i][j].astype(float)
+
+    for i in range(rows):
+        for j in range(cols):
+            new_index = find_nearest_color_index(color_table, img[i, j])
+            new = color_table[new_index].astype(float)
+            old = img[i, j]
+            color_table_indices[i, j] = new_index
+            error = old - new
+            img[i, j] = new
+            for y in range(len(dither_matrix)):
+                for x in range(len(dither_matrix[0])):
+                    dy = j - anchor_col + x
+                    dx = i + y
+                    if 0 <= dx < rows and 0 <= dy < cols:
+                        img[dx, dy] = (error * dither_matrix[y][x]) + img[dx, dy]
     return color_table_indices
 
 
