@@ -1,10 +1,11 @@
-import os
 import argparse
+from operator import itemgetter
+
 import numpy as np
-import lzw
-import tqdm
-from sklearn import cluster
 from PIL import Image
+from sklearn import cluster
+
+import lzw
 
 MAX = 255
 
@@ -51,10 +52,10 @@ def make_random_sample_color_table(color_table_size, img):
 def median_help(bucket):
     if len(bucket) == 1:
         return [bucket, bucket]
-    print(type(bucket))
     var_index = np.argmax(np.var(bucket, axis=0))
-    sorted_bucket = bucket[bucket[:, var_index].argsort()]
-    return np.split(sorted_bucket, 2, axis=0)
+    sorted_bucket = sorted(bucket, key=itemgetter(var_index))
+    mid = int(round(len(sorted_bucket)/2.0))
+    return [sorted_bucket[:mid], sorted_bucket[mid:]]
 
 
 def make_median_cut_color_table(color_table_size, img):
@@ -63,11 +64,7 @@ def make_median_cut_color_table(color_table_size, img):
     the non-recursive median cut algorithm. Shape of `img` is
     (height, width, 3).
     """
-    buckets = [np.unique(img.reshape(-1, 3), axis=0)]
-
-    # numpy can't take uneven sizes in a 2D array
-    if len(buckets[0]) % 2:
-        buckets[0] = np.vstack([buckets[0], [0, 0, 0]])
+    buckets = [[i for i in np.unique(img.reshape(-1, 3), axis=0)]]
 
     while len(buckets) < color_table_size:
         new_buckets = []
