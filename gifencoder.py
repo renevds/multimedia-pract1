@@ -54,7 +54,7 @@ def median_help(bucket):
         return [bucket, bucket]
     var_index = np.argmax(np.var(bucket, axis=0))
     sorted_bucket = sorted(bucket, key=itemgetter(var_index))
-    mid = int(round(len(sorted_bucket)/2.0))
+    mid = int(round(len(sorted_bucket) / 2.0))
     return [sorted_bucket[:mid], sorted_bucket[mid:]]
 
 
@@ -140,20 +140,18 @@ def transform_image_to_indices_diffusion_dithering(img, color_table, dither_matr
     cols = img.shape[1]
     color_table_indices = np.zeros((rows, cols), dtype=np.uint8)
 
-    for i in range(rows):
-        for j in range(cols):
-            img[i][j] = img[i][j].astype(float)
+    color_table = color_table.astype(float)
+    img = img.astype(float)
 
     for i in range(rows):
         for j in range(cols):
-            new_index = find_nearest_color_index(color_table, img[i, j])
-            new = color_table[new_index].astype(float)
             old = img[i, j]
+            new_index = find_nearest_color_index(color_table, img[i, j])
+            new = color_table[new_index]
             color_table_indices[i, j] = new_index
             error = old - new
-            img[i, j] = new
-            for y in range(len(dither_matrix)):
-                for x in range(len(dither_matrix[0])):
+            for y in range(dither_matrix.shape[0]):
+                for x in range(dither_matrix.shape[1]):
                     dy = j - anchor_col + x
                     dx = i + y
                     if 0 <= dx < rows and 0 <= dy < cols:
